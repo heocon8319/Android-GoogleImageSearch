@@ -12,18 +12,23 @@ import android.widget.GridView;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.mikeliu.googleimagesearch.R;
+import me.mikeliu.googleimagesearch.services.MessageBus;
 
-public class ImageResultsView extends BaseView {
+public class ImageResultsView
+        implements MessageBus.Listener{
     @InjectView(R.id.gridView) GridView _gridView;
     private MenuItem _searchMenuItem;
 
     private Activity _ctrl;
+    private MessageBus _bus;
 
-    public ImageResultsView(Context context, ViewListener _viewListener) {
+    public ImageResultsView(Context context) {
         _ctrl = (Activity) context;
 
+        _bus = MessageBus.instance();
+        _bus.addListener(MessageBus.E_NEW_SEARCH, this);
+
         View view = View.inflate(_ctrl, R.layout.activity_main, null);
-        setViewListener(_viewListener);
         _ctrl.setContentView(view);
 
         ButterKnife.inject(this, view);
@@ -38,5 +43,17 @@ public class ImageResultsView extends BaseView {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(_ctrl.getComponentName()));
 
         return true;
+    }
+
+    public void dispose() {
+        _bus.removeListener(MessageBus.E_NEW_SEARCH, this);
+    }
+
+    @Override public void notify(String event, Object object) {
+        switch(event) {
+            case MessageBus.E_NEW_SEARCH:
+                _searchMenuItem.collapseActionView();
+                break;
+        }
     }
 }

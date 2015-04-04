@@ -9,7 +9,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".activities.ImageResultsActivity"
+            android:name=".controllers.ImageResultsController"
             android:label="@string/app_name"
             android:launchMode="singleTop" >
             <intent-filter>
