@@ -59,6 +59,12 @@ public class ImageResultsView {
         return true;
     }
 
+    public void onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+        }
+    }
+
     public void dispose() {
         _bus.unregister(this);
     }

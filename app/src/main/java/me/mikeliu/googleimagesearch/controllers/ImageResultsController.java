@@ -52,6 +52,7 @@ public class ImageResultsController
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
+        _view.onOptionsItemSelected(item);
         return super.onOptionsItemSelected(item);
     }
 

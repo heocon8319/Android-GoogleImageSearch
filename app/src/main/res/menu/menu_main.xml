@@ -9,8 +9,8 @@
           android:icon="@drawable/ic_menu_search"
           app:showAsAction="collapseActionView|ifRoom"
           app:actionViewClass="android.support.v7.widget.SearchView" />
-    <!--<item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
-          android:orderInCategory="100"
-          app:showAsAction="never"/>-->
+    <item android:id="@+id/action_history"
+          android:title="@string/action_history"
+          android:icon="@drawable/ic_menu_recent_history"
+          app:showAsAction="ifRoom"/>
 </menu>
