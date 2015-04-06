@@ -12,6 +12,7 @@ import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 
+import me.mikeliu.googleimagesearch.R;
 import me.mikeliu.googleimagesearch.controllers.adapters.ImageResultsGridAdapter;
 import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 import me.mikeliu.googleimagesearch.services.GoogleImageFetchTask;
@@ -56,19 +57,17 @@ public class ImageResultsFragmentController extends Fragment {
     }
 
     @Subscribe public void eventSearchStarted(SearchStartedEvent event) {
-        _resultsModel.query = event.query;
-        _resultsModel.hasMorePages = true;
-        _resultsModel.response = null;
-
-        _adapter.clear();
-        _adapter.notifyDataSetInvalidated();
+        if (event.model.response == null) {
+            _adapter.clear();
+            _adapter.notifyDataSetInvalidated();
+        }
 
         if (_task != null) {
             _task.cancel(true);
         }
 
         _task = new GoogleImageFetchTask();
-        _task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, event.query);
+        _task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, event.model);
     }
 
     @Subscribe public void eventSearchCompleted(SearchCompletedEvent event) {
@@ -81,6 +80,7 @@ public class ImageResultsFragmentController extends Fragment {
 
                 // TODO: merge pagination calls
                 _resultsModel.response = event.response;
+
                 _resultsModel.hasMorePages = event.status == SearchCompletedEvent.DONE;
 
                 _adapter.addAll(event.response.Data.Results);
@@ -88,7 +88,12 @@ public class ImageResultsFragmentController extends Fragment {
 
                 break;
             case SearchCompletedEvent.FAILED:
-                ActivityUtils.toast("Failed to fetch images.  Please try a new query.");
+                if (event.statusMessage != null && !event.statusMessage.isEmpty()) {
+                    ActivityUtils.toast(event.statusMessage);
+                } else {
+                    ActivityUtils.toast(getActivity().getString(R.string.image_fetch_failed));
+                }
+
                 break;
         }
     }

@@ -1,9 +1,11 @@
 package me.mikeliu.googleimagesearch.services.messages;
 
-public class SearchStartedEvent {
-    public final String query;
+import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 
-    public SearchStartedEvent(String query) {
-        this.query = query;
+public class SearchStartedEvent {
+    public final ImageResultsModel model;
+
+    public SearchStartedEvent(ImageResultsModel model) {
+        this.model = model;
     }
 }

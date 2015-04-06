@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Bus;
 
+import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
 import me.mikeliu.googleimagesearch.services.storage.HistoryContentProvider;
 import me.mikeliu.googleimagesearch.utils.IoC;
@@ -25,6 +26,7 @@ public class AppActivityController extends ActionBarActivity {
 
     private AppView _view;
     private Bus _bus = IoC.resolve(Bus.class);
+    private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,9 +54,10 @@ public class AppActivityController extends ActionBarActivity {
             case Intent.ACTION_SEARCH: {
                 String query = intent.getStringExtra(SearchManager.QUERY);
 
-                if (query != null
-                        && !query.isEmpty()) {
-                    SearchStartedEvent event = new SearchStartedEvent(query);
+                if (query != null && !query.isEmpty()) {
+                    _resultsModel.setNewQuery(query);
+
+                    SearchStartedEvent event = new SearchStartedEvent(_resultsModel);
                     _bus.post(event);
 
                     HistoryContentProvider.insertQuery(query);

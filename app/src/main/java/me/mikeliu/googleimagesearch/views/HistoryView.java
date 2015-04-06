@@ -14,6 +14,7 @@ import com.squareup.otto.Bus;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.mikeliu.googleimagesearch.R;
+import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
 import me.mikeliu.googleimagesearch.services.storage.DatabaseHelper;
 import me.mikeliu.googleimagesearch.utils.IoC;
@@ -39,12 +40,19 @@ public class HistoryView {
         return rootView;
     }
 
+    public void dispose() {
+        _bus.unregister(this);
+    }
+
     private class ListViewItemClickListener implements AdapterView.OnItemClickListener {
         @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Cursor cursor = (Cursor) _adapter.getItem(position);
             String query = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUERY));
 
-            SearchStartedEvent event = new SearchStartedEvent(query);
+            ImageResultsModel resultsModel = IoC.resolve(ImageResultsModel.class);
+            resultsModel.setNewQuery(query);
+
+            SearchStartedEvent event = new SearchStartedEvent(resultsModel);
             _bus.post(event);
         }
     }

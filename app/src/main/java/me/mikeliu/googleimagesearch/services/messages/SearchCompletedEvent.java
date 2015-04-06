@@ -10,4 +10,5 @@ public class SearchCompletedEvent {
     public String query;
     public int status;
     public GoogleImageSearchResponse response;
+    public String statusMessage;
 }

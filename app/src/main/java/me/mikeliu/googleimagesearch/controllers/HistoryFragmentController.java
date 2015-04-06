@@ -27,6 +27,7 @@ public class HistoryFragmentController
 
     private SimpleCursorAdapter _historyAdapter;
     private HistoryContentObserver _contentObserver;
+    private HistoryView _view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,8 +41,8 @@ public class HistoryFragmentController
                 0);
 
         // create view
-        HistoryView fragmentView = new HistoryView(_historyAdapter);
-        View view = fragmentView.onCreateView(inflater, container, savedInstanceState);
+        _view = new HistoryView(_historyAdapter);
+        View resultView = _view.onCreateView(inflater, container, savedInstanceState);
 
         // load data
         getLoaderManager().initLoader(0, null, this);
@@ -54,11 +55,14 @@ public class HistoryFragmentController
                 _contentObserver
         );
 
-        return view;
+        return resultView;
     }
 
     @Override public void onDestroy() {
         super.onDestroy();
+
+        _view.dispose();
+
         if (_contentObserver != null) {
             getActivity().getContentResolver().unregisterContentObserver(_contentObserver);
         }
