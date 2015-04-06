@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 
@@ -19,7 +20,13 @@ import me.mikeliu.googleimagesearch.services.messages.SearchCompletedEvent;
 import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
 import me.mikeliu.googleimagesearch.utils.IoC;
 
-public class ImageResultsView {
+public class ImageResultsView implements AbsListView.OnScrollListener {
+    /** Min number of results to load before infinite scroll starts */
+    private static final int GRID_VIEW_RESULTS_MIN = 24;
+
+    /** For infinite scroll: number of results we want to pre-load on the next page of results */
+    private static final int GRID_VIEW_RESULTS_BUFFER = 12;
+
     @InjectView(R.id.gridView) GridView _gridView;
     @InjectView(R.id.progressBar) ProgressBar _progressView;
 
@@ -27,6 +34,7 @@ public class ImageResultsView {
     private Bus _bus = IoC.resolve(Bus.class);
     private boolean _paginationEnabled;
     private boolean _loadingMoreResults;
+    private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
 
     public ImageResultsView(ImageResultsGridAdapter adapter) {
         _adapter = adapter;
@@ -39,6 +47,8 @@ public class ImageResultsView {
         _gridView.setAdapter(_adapter);
 
         _bus.register(this);
+
+        _gridView.setOnScrollListener(this);
 
         return view;
     }
@@ -54,17 +64,17 @@ public class ImageResultsView {
     }
 
     @Subscribe public void eventSearchCompleted(SearchCompletedEvent event) {
+        _progressView.setVisibility(View.INVISIBLE);
+
         switch(event.status) {
             case SearchCompletedEvent.DONE_LASTPAGE:
             case SearchCompletedEvent.FAILED:
                 _paginationEnabled = false;
                 _loadingMoreResults = false;
-                _progressView.setVisibility(View.INVISIBLE);
                 break;
             case SearchCompletedEvent.DONE:
-                ImageResultsModel resultsModel = IoC.resolve(ImageResultsModel.class);
-                if (resultsModel.hasMorePages) {
-                    SearchStartedEvent newSearch = new SearchStartedEvent(resultsModel);
+                if (_adapter.getCount() < GRID_VIEW_RESULTS_MIN) {
+                    SearchStartedEvent newSearch = new SearchStartedEvent(_resultsModel);
                     _bus.post(newSearch);
                 } else {
                     _paginationEnabled = false;
@@ -72,6 +82,20 @@ public class ImageResultsView {
                 }
 
                 break;
+        }
+    }
+
+    @Override public void onScrollStateChanged(AbsListView view, int scrollState) { }
+
+    @Override
+    public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+        if (_loadingMoreResults || !_paginationEnabled || !_resultsModel.hasMorePages) {
+            return;
+        }
+
+        if (totalItemCount <= firstVisibleItem + visibleItemCount + GRID_VIEW_RESULTS_BUFFER) {
+            SearchStartedEvent newSearch = new SearchStartedEvent(_resultsModel);
+            _bus.post(newSearch);
         }
     }
 }
