@@ -15,6 +15,7 @@ public class ImageSearchApp extends Application {
         super.onCreate();
         instance = this;
 
+        // Our IoC container doesn't support objects without empty constructors yet
         IoC.register(Picasso.with(getContext()));
     }
 

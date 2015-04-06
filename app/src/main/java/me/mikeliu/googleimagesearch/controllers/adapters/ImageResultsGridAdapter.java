@@ -1,4 +1,4 @@
-package me.mikeliu.googleimagesearch.views;
+package me.mikeliu.googleimagesearch.controllers.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -19,7 +19,6 @@ import me.mikeliu.googleimagesearch.utils.IoC;
 
 public class ImageResultsGridAdapter extends ArrayAdapter<GoogleImageSearchResult> {
     LayoutInflater _inflater;
-    Picasso _imageLoader = IoC.resolve(Picasso.class);
 
     public ImageResultsGridAdapter(Context context, ArrayList<GoogleImageSearchResult> results) {
         super(context, R.layout.item_image, results);
@@ -38,9 +37,7 @@ public class ImageResultsGridAdapter extends ArrayAdapter<GoogleImageSearchResul
         }
 
         GoogleImageSearchResult result = getItem(position);
-
-        _imageLoader.load(result.url).into(holder.imageView);
-
+        IoC.resolve(Picasso.class).load(result.url).into(holder.imageView);
         return view;
     }
 

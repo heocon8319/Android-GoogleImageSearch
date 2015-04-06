@@ -5,12 +5,8 @@
 
     <item android:id="@+id/search"
           android:title="@string/search_title"
-          app:queryHint="blah"
-          android:icon="@drawable/ic_menu_search"
+          android:icon="@drawable/action_search"
           app:showAsAction="collapseActionView|ifRoom"
           app:actionViewClass="android.support.v7.widget.SearchView" />
-    <item android:id="@+id/action_history"
-          android:title="@string/action_history"
-          android:icon="@drawable/ic_menu_recent_history"
-          app:showAsAction="ifRoom"/>
+
 </menu>

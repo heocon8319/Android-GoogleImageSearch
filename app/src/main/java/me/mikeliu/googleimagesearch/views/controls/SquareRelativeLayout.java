@@ -1,4 +1,4 @@
-package me.mikeliu.googleimagesearch.views;
+package me.mikeliu.googleimagesearch.views.controls;
 
 import android.content.Context;
 import android.util.AttributeSet;

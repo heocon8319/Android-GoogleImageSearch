@@ -4,7 +4,7 @@ import android.widget.Toast;
 
 import me.mikeliu.googleimagesearch.ImageSearchApp;
 
-public class ActivityUtils {
+public final class ActivityUtils {
     private static Toast _toast;
 
     public static void toast(String text) {
@@ -20,9 +20,7 @@ public class ActivityUtils {
     }
 
     public static void clearToast() {
-        if (_toast != null){
-            _toast.cancel();
-        }
+        if (_toast != null) _toast.cancel();
     }
 }
 

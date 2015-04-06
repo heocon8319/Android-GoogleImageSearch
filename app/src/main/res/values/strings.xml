@@ -3,5 +3,8 @@
 
     <string name="search_title">Search</string>
     <string name="search_hint">Query (i.e. funny cats)</string>
-    <string name="action_history">History</string>
+
+    <string name="drawer_open">Search History</string>
+    <string name="drawer_close">Image Search Results</string>
+    <string name="history_fragment_title">Search History</string>
 </resources>
