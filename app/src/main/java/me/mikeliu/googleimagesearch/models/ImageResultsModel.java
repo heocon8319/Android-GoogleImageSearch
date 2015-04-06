@@ -6,6 +6,7 @@ public class ImageResultsModel {
     public String query;
     public boolean hasMorePages;
     public GoogleImageSearchResponse response;
+    public boolean isLoading;
 
     public void setNewQuery(String query) {
         this.query = query;

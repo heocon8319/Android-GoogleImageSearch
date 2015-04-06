@@ -33,7 +33,6 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
     private ImageResultsGridAdapter _adapter;
     private Bus _bus = IoC.resolve(Bus.class);
     private boolean _paginationEnabled;
-    private boolean _loadingMoreResults;
     private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
 
     public ImageResultsView(ImageResultsGridAdapter adapter) {
@@ -60,7 +59,6 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
     @Subscribe public void eventSearchStarted(SearchStartedEvent event) {
         _progressView.setVisibility(View.VISIBLE);
         _paginationEnabled = true;
-        _loadingMoreResults = true;
     }
 
     @Subscribe public void eventSearchCompleted(SearchCompletedEvent event) {
@@ -69,15 +67,15 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
             case SearchCompletedEvent.FAILED:
                 _progressView.setVisibility(View.INVISIBLE);
                 _paginationEnabled = false;
-                _loadingMoreResults = false;
+                _resultsModel.isLoading = false;
                 break;
             case SearchCompletedEvent.DONE:
-                if (_adapter.getCount() < GRID_VIEW_RESULTS_MIN) {
+                if (_adapter.getCount() >= GRID_VIEW_RESULTS_MIN) {
                     SearchStartedEvent newSearch = new SearchStartedEvent(_resultsModel);
                     _bus.post(newSearch);
                 } else {
                     _progressView.setVisibility(View.INVISIBLE);
-                    _loadingMoreResults = false;
+                    _resultsModel.isLoading = false;
                 }
 
                 break;
@@ -88,7 +86,7 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if (_loadingMoreResults || !_paginationEnabled || !_resultsModel.hasMorePages) {
+        if (_resultsModel.isLoading || !_paginationEnabled || !_resultsModel.hasMorePages) {
             return;
         }
 

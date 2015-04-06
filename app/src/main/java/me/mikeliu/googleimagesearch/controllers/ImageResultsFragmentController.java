@@ -69,6 +69,8 @@ public class ImageResultsFragmentController extends Fragment {
             _task.cancel(true);
         }
 
+        _resultsModel.isLoading = true;
+
         _task = new GoogleImageFetchTask();
         _task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, event.model);
     }
