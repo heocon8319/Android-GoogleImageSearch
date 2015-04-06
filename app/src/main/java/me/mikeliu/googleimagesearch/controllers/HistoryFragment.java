@@ -31,6 +31,7 @@ public class HistoryFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         // create data adapter
         _historyAdapter = new SimpleCursorAdapter(
                 getActivity(),

@@ -9,7 +9,4 @@ public class GoogleImageSearchResponse {
 
     @SerializedName("responseDetails")
     public String Details;
-
-    @SerializedName("responseStatus")
-    public int Status;
 }

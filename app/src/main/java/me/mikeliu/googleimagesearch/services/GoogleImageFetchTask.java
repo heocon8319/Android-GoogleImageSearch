@@ -15,6 +15,8 @@ import com.squareup.otto.Bus;
 
 import java.io.IOException;
 
+import me.mikeliu.googleimagesearch.ImageSearchApp;
+import me.mikeliu.googleimagesearch.R;
 import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 import me.mikeliu.googleimagesearch.services.json.GoogleImageSearchCursor;
 import me.mikeliu.googleimagesearch.services.json.GoogleImageSearchResponse;
@@ -41,11 +43,17 @@ public class GoogleImageFetchTask extends AsyncTask<ImageResultsModel, Void, Sea
         result.query = model.query;
         String encodedQuery = Uri.encode(result.query);
 
-        // get the next page - TODO: error checking
         int start = 0;
-        if (model.response != null) {
+        if (model.response != null &&
+                model.response.Data != null &&
+                model.response.Data.Cursor != null) {
             GoogleImageSearchCursor c = model.response.Data.Cursor;
-            start = c.Pages[c.PageIndex + 1].Start;
+            int newPageIndex = c.PageIndex + 1;
+            if (c.Pages != null && newPageIndex < c.Pages.length) {
+                start = c.Pages[newPageIndex].Start;
+            } else {
+                throw new IllegalStateException("Tried to paginate past the last page");
+            }
         }
 
         String requestUrl = String.format(REQUEST_URL, encodedQuery, start, Utils.getUserIp());
@@ -91,6 +99,8 @@ public class GoogleImageFetchTask extends AsyncTask<ImageResultsModel, Void, Sea
 
             if (r != null && r.Details != null) {
                 result.statusMessage = r.Details;
+            } else {
+                result.statusMessage = ImageSearchApp.getContext().getString(R.string.unexpected_json_error_msg);
             }
 
             return result;

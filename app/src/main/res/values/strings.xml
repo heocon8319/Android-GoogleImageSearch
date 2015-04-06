@@ -8,4 +8,5 @@
     <string name="drawer_close">Image Search Results</string>
     <string name="history_fragment_title">Search History</string>
     <string name="image_fetch_failed">Failed to fetch images.  Please try a new query.</string>
+    <string name="unexpected_json_error_msg">Saw unexpected json from Google Image API</string>
 </resources>

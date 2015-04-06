@@ -84,8 +84,6 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
         }
     }
 
-    @Override public void onScrollStateChanged(AbsListView view, int scrollState) { }
-
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if (_resultsModel.isLoading || !_resultsModel.hasMorePages) {
@@ -96,5 +94,9 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
             SearchPaginateEvent paginateEvent = new SearchPaginateEvent();
             _bus.post(paginateEvent);
         }
+    }
+
+    @Override public void onScrollStateChanged(AbsListView view, int scrollState) {
+
     }
 }

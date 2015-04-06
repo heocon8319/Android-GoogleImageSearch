@@ -3,7 +3,6 @@ package me.mikeliu.googleimagesearch.controllers;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +18,8 @@ import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 import me.mikeliu.googleimagesearch.services.GoogleImageFetchTask;
 import me.mikeliu.googleimagesearch.services.json.GoogleImageSearchResult;
 import me.mikeliu.googleimagesearch.services.messages.SearchCompletedEvent;
-import me.mikeliu.googleimagesearch.services.messages.SearchPaginateEvent;
 import me.mikeliu.googleimagesearch.services.messages.SearchNewQueryEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchPaginateEvent;
 import me.mikeliu.googleimagesearch.utils.ActivityUtils;
 import me.mikeliu.googleimagesearch.utils.IoC;
 import me.mikeliu.googleimagesearch.utils.Utils;
@@ -42,7 +41,6 @@ public class ImageResultsFragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.w(TAG, "onCreateView");
 
         // create data adapter
         _adapter = new ImageResultsGridAdapter(getActivity(), new ArrayList<GoogleImageSearchResult>());
@@ -61,8 +59,6 @@ public class ImageResultsFragment
     }
 
     @Override public void onDestroy() {
-        Log.w(TAG, "onDestroy");
-
         super.onDestroy();
 
         _bus.unregister(this);
