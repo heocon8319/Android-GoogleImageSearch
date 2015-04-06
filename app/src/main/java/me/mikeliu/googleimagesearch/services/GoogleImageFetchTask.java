@@ -61,6 +61,7 @@ public class GoogleImageFetchTask extends AsyncTask<ImageResultsModel, Void, Sea
         } catch (IOException e) {
             e.printStackTrace();
             result.status = SearchCompletedEvent.FAILED;
+            result.statusMessage = e.getMessage();
             return result;
         }
 
@@ -77,6 +78,7 @@ public class GoogleImageFetchTask extends AsyncTask<ImageResultsModel, Void, Sea
         } catch (JsonSyntaxException | IllegalStateException e) {
             e.printStackTrace();
             result.status = SearchCompletedEvent.FAILED;
+            result.statusMessage = e.getMessage();
             return result;
         }
 

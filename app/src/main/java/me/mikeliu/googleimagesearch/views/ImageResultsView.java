@@ -64,11 +64,10 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
     }
 
     @Subscribe public void eventSearchCompleted(SearchCompletedEvent event) {
-        _progressView.setVisibility(View.INVISIBLE);
-
         switch(event.status) {
             case SearchCompletedEvent.DONE_LASTPAGE:
             case SearchCompletedEvent.FAILED:
+                _progressView.setVisibility(View.INVISIBLE);
                 _paginationEnabled = false;
                 _loadingMoreResults = false;
                 break;
@@ -77,7 +76,7 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
                     SearchStartedEvent newSearch = new SearchStartedEvent(_resultsModel);
                     _bus.post(newSearch);
                 } else {
-                    _paginationEnabled = false;
+                    _progressView.setVisibility(View.INVISIBLE);
                     _loadingMoreResults = false;
                 }
 
