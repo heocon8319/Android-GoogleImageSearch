@@ -92,6 +92,7 @@ public class AppView {
     }
 
     @Subscribe public void eventSearchStarted(SearchStartedEvent event) {
+        _drawer.closeDrawers();
         if (_searchMenuItem != null) _searchMenuItem.collapseActionView();
         updateTitle();
     }
@@ -112,7 +113,7 @@ public class AppView {
 
     public void onPrepareOptionsMenu(Menu menu) {
         boolean drawerOpen = isDrawerOpen();
-        menu.findItem(R.id.search).setVisible(!drawerOpen);
+        _searchMenuItem.setVisible(!drawerOpen);
         if (drawerOpen) {
             _searchMenuItem.collapseActionView();
         }
