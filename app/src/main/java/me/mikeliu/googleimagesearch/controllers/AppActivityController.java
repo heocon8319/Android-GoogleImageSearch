@@ -7,7 +7,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Bus;
 
 import me.mikeliu.googleimagesearch.models.ImageResultsModel;
@@ -30,7 +29,6 @@ public class AppActivityController extends ActionBarActivity {
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Crashlytics.start(this);
 
         _view = new AppView(this);
 

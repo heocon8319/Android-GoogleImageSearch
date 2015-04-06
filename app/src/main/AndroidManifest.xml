@@ -26,10 +26,6 @@
             android:name=".services.storage.HistoryContentProvider"
             android:authorities="me.mikeliu.googleimagesearch.history"
             android:exported="false" />
-
-        <meta-data
-            android:name="com.crashlytics.ApiKey"
-            android:value="5fe861e86a5e67ae496a043b61a430b5d6bf538d" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
