@@ -110,6 +110,8 @@ public class ImageResultsFragmentController extends Fragment {
                     ActivityUtils.toast(getActivity().getString(R.string.image_fetch_failed));
                 }
 
+                _resultsModel.hasMorePages = false;
+
                 break;
         }
     }

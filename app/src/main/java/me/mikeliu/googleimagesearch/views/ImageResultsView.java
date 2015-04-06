@@ -22,9 +22,9 @@ import me.mikeliu.googleimagesearch.utils.IoC;
 
 public class ImageResultsView implements AbsListView.OnScrollListener {
     /** Min number of results to load before infinite scroll starts */
-    private static final int GRID_VIEW_RESULTS_MIN = 24;
+    private static final int GRID_VIEW_RESULTS_MIN = 20;
 
-    /** For infinite scroll: number of results we want to pre-load on the next page of results */
+    /** For infinite scroll: min number of results we want to pre-load on the next page of results */
     private static final int GRID_VIEW_RESULTS_BUFFER = 12;
 
     @InjectView(R.id.gridView) GridView _gridView;
@@ -32,7 +32,6 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
 
     private ImageResultsGridAdapter _adapter;
     private Bus _bus = IoC.resolve(Bus.class);
-    private boolean _paginationEnabled;
     private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
 
     public ImageResultsView(ImageResultsGridAdapter adapter) {
@@ -58,7 +57,6 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
 
     @Subscribe public void eventSearchStarted(SearchStartedEvent event) {
         _progressView.setVisibility(View.VISIBLE);
-        _paginationEnabled = true;
     }
 
     @Subscribe public void eventSearchCompleted(SearchCompletedEvent event) {
@@ -66,11 +64,10 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
             case SearchCompletedEvent.DONE_LASTPAGE:
             case SearchCompletedEvent.FAILED:
                 _progressView.setVisibility(View.INVISIBLE);
-                _paginationEnabled = false;
                 _resultsModel.isLoading = false;
                 break;
             case SearchCompletedEvent.DONE:
-                if (_adapter.getCount() >= GRID_VIEW_RESULTS_MIN) {
+                if (_adapter.getCount() <= GRID_VIEW_RESULTS_MIN) {
                     SearchStartedEvent newSearch = new SearchStartedEvent(_resultsModel);
                     _bus.post(newSearch);
                 } else {
@@ -86,7 +83,7 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
 
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-        if (_resultsModel.isLoading || !_paginationEnabled || !_resultsModel.hasMorePages) {
+        if (_resultsModel.isLoading || !_resultsModel.hasMorePages) {
             return;
         }
 
