@@ -17,7 +17,8 @@ import me.mikeliu.googleimagesearch.R;
 import me.mikeliu.googleimagesearch.controllers.adapters.ImageResultsGridAdapter;
 import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 import me.mikeliu.googleimagesearch.services.messages.SearchCompletedEvent;
-import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchPaginateEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchNewQueryEvent;
 import me.mikeliu.googleimagesearch.utils.IoC;
 
 public class ImageResultsView implements AbsListView.OnScrollListener {
@@ -55,7 +56,11 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
         _bus.unregister(this);
     }
 
-    @Subscribe public void eventSearchStarted(SearchStartedEvent event) {
+    @Subscribe public void eventSearchStarted(SearchNewQueryEvent event) {
+        _progressView.setVisibility(View.VISIBLE);
+    }
+
+    @Subscribe public void eventSearchPaginate(SearchPaginateEvent event) {
         _progressView.setVisibility(View.VISIBLE);
     }
 
@@ -68,8 +73,8 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
                 break;
             case SearchCompletedEvent.DONE:
                 if (_adapter.getCount() <= GRID_VIEW_RESULTS_MIN) {
-                    SearchStartedEvent newSearch = new SearchStartedEvent(_resultsModel);
-                    _bus.post(newSearch);
+                    SearchPaginateEvent paginateEvent = new SearchPaginateEvent();
+                    _bus.post(paginateEvent);
                 } else {
                     _progressView.setVisibility(View.INVISIBLE);
                     _resultsModel.isLoading = false;
@@ -88,8 +93,8 @@ public class ImageResultsView implements AbsListView.OnScrollListener {
         }
 
         if (totalItemCount <= firstVisibleItem + visibleItemCount + GRID_VIEW_RESULTS_BUFFER) {
-            SearchStartedEvent newSearch = new SearchStartedEvent(_resultsModel);
-            _bus.post(newSearch);
+            SearchPaginateEvent paginateEvent = new SearchPaginateEvent();
+            _bus.post(paginateEvent);
         }
     }
 }

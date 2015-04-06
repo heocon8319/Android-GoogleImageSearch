@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
@@ -16,54 +17,56 @@ import com.squareup.otto.Subscribe;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import me.mikeliu.googleimagesearch.ImageSearchApp;
 import me.mikeliu.googleimagesearch.R;
 import me.mikeliu.googleimagesearch.models.ImageResultsModel;
-import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchNewQueryEvent;
 import me.mikeliu.googleimagesearch.utils.IoC;
 
 /**
- * View for the app container.
- * We'll handle UI common to all screens here, such as the action bar.
+ * View for the main app container
+ * We'll handle common View objects here, such as the DrawerLayout and ActionBar
  */
 public class AppView {
     @InjectView(R.id.drawer_layout) DrawerLayout _drawer;
     @InjectView(R.id.drawer_fragment) View _drawerSidebar;
-
     private ActionBarDrawerToggle _drawerToggle;
-    private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
-
     private MenuItem _searchMenuItem;
-    private Bus _bus = IoC.resolve(Bus.class);
-    private ActionBarActivity _activity;
+    private ActionBar _actionBar;
 
-    public AppView(Context context) {
-        _activity = (ActionBarActivity) context;
+    private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
+    private Bus _bus = IoC.resolve(Bus.class);
+
+    public AppView(final Context context) {
+        ActionBarActivity activity = (ActionBarActivity) context;
+        _actionBar = activity.getSupportActionBar();
+
         View view = View.inflate(context, R.layout.activity_main, null);
-        _activity.setContentView(view);
+        activity.setContentView(view);
         ButterKnife.inject(this, view);
 
         _bus.register(this);
 
         _drawerToggle = new ActionBarDrawerToggle(
-                _activity,
+                activity,
                 _drawer,
                 R.string.drawer_open,
                 R.string.drawer_close) {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 updateTitle();
-                _activity.invalidateOptionsMenu();
+                ((ActionBarActivity) context).invalidateOptionsMenu();
             }
 
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 updateTitle();
-                _activity.invalidateOptionsMenu();
+                ((ActionBarActivity) context).invalidateOptionsMenu();
             }
         };
 
-        _activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        _activity.getSupportActionBar().setHomeButtonEnabled(true);
+        _actionBar.setDisplayHomeAsUpEnabled(true);
+        _actionBar.setHomeButtonEnabled(true);
 
         _drawer.post(new Runnable() {
             @Override
@@ -93,7 +96,7 @@ public class AppView {
         return true;
     }
 
-    @Subscribe public void eventSearchStarted(SearchStartedEvent event) {
+    @Subscribe public void eventSearchStarted(SearchNewQueryEvent event) {
         _drawer.closeDrawers();
         if (_searchMenuItem != null) _searchMenuItem.collapseActionView();
         updateTitle();
@@ -103,12 +106,12 @@ public class AppView {
         boolean drawerOpen = isDrawerOpen();
 
         if (drawerOpen) {
-            _activity.getSupportActionBar().setTitle(_activity.getString(R.string.history_fragment_title));
+            _actionBar.setTitle(ImageSearchApp.getContext().getString(R.string.history_fragment_title));
         } else {
             if (_resultsModel.query != null && !_resultsModel.query.isEmpty()) {
-                _activity.getSupportActionBar().setTitle(_resultsModel.query);
+                _actionBar.setTitle(_resultsModel.query);
             } else {
-                _activity.getSupportActionBar().setTitle(R.string.app_name);
+                _actionBar.setTitle(R.string.app_name);
             }
         }
     }

@@ -108,6 +108,8 @@ public class GoogleImageFetchTask extends AsyncTask<ImageResultsModel, Void, Sea
 
     @Override
     protected void onPostExecute(SearchCompletedEvent event) {
-        _bus.post(event);
+        if (!isCancelled()) {
+            _bus.post(event);
+        }
     }
 }

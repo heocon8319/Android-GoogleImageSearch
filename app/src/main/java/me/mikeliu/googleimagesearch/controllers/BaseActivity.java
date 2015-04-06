@@ -9,23 +9,19 @@ import android.view.MenuItem;
 
 import com.squareup.otto.Bus;
 
-import me.mikeliu.googleimagesearch.models.ImageResultsModel;
-import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchNewQueryEvent;
 import me.mikeliu.googleimagesearch.services.storage.HistoryContentProvider;
 import me.mikeliu.googleimagesearch.utils.IoC;
 import me.mikeliu.googleimagesearch.views.AppView;
 
 /**
- * Single activity container for the app.
- *
- * We'll instantiate fragments inside this activity for different screens
- * and use it as a controller to communicate to views and fragment controllers.
+ * Main controller for the app
  */
-public class AppActivityController extends ActionBarActivity {
+public class BaseActivity
+        extends ActionBarActivity {
 
     private AppView _view;
     private Bus _bus = IoC.resolve(Bus.class);
-    private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,8 +38,8 @@ public class AppActivityController extends ActionBarActivity {
     @Override protected void onDestroy() {
         super.onDestroy();
 
-        _view.dispose();
         _bus.unregister(this);
+        _view.dispose();
     }
 
     @Override protected void onNewIntent(Intent intent) {
@@ -53,9 +49,7 @@ public class AppActivityController extends ActionBarActivity {
                 String query = intent.getStringExtra(SearchManager.QUERY);
 
                 if (query != null && !query.isEmpty()) {
-                    _resultsModel.setNewQuery(query);
-
-                    SearchStartedEvent event = new SearchStartedEvent(_resultsModel);
+                    SearchNewQueryEvent event = new SearchNewQueryEvent(query);
                     _bus.post(event);
 
                     HistoryContentProvider.insertQuery(query);

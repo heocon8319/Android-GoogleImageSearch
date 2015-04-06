@@ -3,6 +3,7 @@ package me.mikeliu.googleimagesearch.controllers;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,24 +19,31 @@ import me.mikeliu.googleimagesearch.models.ImageResultsModel;
 import me.mikeliu.googleimagesearch.services.GoogleImageFetchTask;
 import me.mikeliu.googleimagesearch.services.json.GoogleImageSearchResult;
 import me.mikeliu.googleimagesearch.services.messages.SearchCompletedEvent;
-import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchPaginateEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchNewQueryEvent;
 import me.mikeliu.googleimagesearch.utils.ActivityUtils;
 import me.mikeliu.googleimagesearch.utils.IoC;
+import me.mikeliu.googleimagesearch.utils.Utils;
 import me.mikeliu.googleimagesearch.views.ImageResultsView;
 
 /**
- * Fragment controller for the view containing image results.
+ * Image results controller
  */
-public class ImageResultsFragmentController extends Fragment {
+public class ImageResultsFragment
+        extends Fragment {
+    private static final String TAG = ImageResultsFragment.class.getName();
+
+    private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
+    private ImageResultsView _view;
+    private ImageResultsGridAdapter _adapter;
+    private GoogleImageFetchTask _task;
 
     private Bus _bus = IoC.resolve(Bus.class);
-    private ImageResultsModel _resultsModel = IoC.resolve(ImageResultsModel.class);
-    private GoogleImageFetchTask _task;
-    private ImageResultsGridAdapter _adapter;
-    private ImageResultsView _view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.w(TAG, "onCreateView");
+
         // create data adapter
         _adapter = new ImageResultsGridAdapter(getActivity(), new ArrayList<GoogleImageSearchResult>());
         if (_resultsModel.response != null) {
@@ -53,26 +61,41 @@ public class ImageResultsFragmentController extends Fragment {
     }
 
     @Override public void onDestroy() {
+        Log.w(TAG, "onDestroy");
+
         super.onDestroy();
 
-        _view.dispose();
         _bus.unregister(this);
-    }
 
-    @Subscribe public void eventSearchStarted(SearchStartedEvent event) {
-        if (event.model.response == null) {
-            _adapter.clear();
-            _adapter.notifyDataSetInvalidated();
+        if (_task != null) {
+            _task.cancel(true);
+            _resultsModel.isLoading = false;
         }
 
+        _view.dispose();
+    }
+
+    private void fetchMoreResults() {
         if (_task != null) {
             _task.cancel(true);
         }
 
         _resultsModel.isLoading = true;
-
         _task = new GoogleImageFetchTask();
-        _task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, event.model);
+        _task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, _resultsModel);
+    }
+
+    @Subscribe public void eventSearchStarted(SearchNewQueryEvent event) {
+        _adapter.clear();
+        _adapter.notifyDataSetInvalidated();
+
+        _resultsModel.setNewQuery(event.query);
+
+        fetchMoreResults();
+    }
+
+    @Subscribe public void eventSearchPaginate(SearchPaginateEvent event) {
+        fetchMoreResults();
     }
 
     @Subscribe public void eventSearchCompleted(SearchCompletedEvent event) {
@@ -87,13 +110,9 @@ public class ImageResultsFragmentController extends Fragment {
                 if (_resultsModel.response == null) {
                     _resultsModel.response = event.response;
                 } else {
-                    GoogleImageSearchResult[] oldResults = _resultsModel.response.Data.Results;
-                    GoogleImageSearchResult[] newResults = event.response.Data.Results;
-                    GoogleImageSearchResult[] combinedResults = new GoogleImageSearchResult[
-                            oldResults.length + newResults.length];
-                    System.arraycopy(oldResults, 0, combinedResults, 0, oldResults.length);
-                    System.arraycopy(newResults, 0, combinedResults, oldResults.length, newResults.length);
-                    _resultsModel.response.Data.Results = combinedResults;
+                    _resultsModel.response.Data.Results = Utils.concat(
+                            _resultsModel.response.Data.Results,
+                            event.response.Data.Results);
                     _resultsModel.response.Data.Cursor = event.response.Data.Cursor;
                 }
 

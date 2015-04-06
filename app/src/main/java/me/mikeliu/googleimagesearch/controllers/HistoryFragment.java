@@ -19,15 +19,15 @@ import me.mikeliu.googleimagesearch.services.storage.HistoryContentProvider;
 import me.mikeliu.googleimagesearch.views.HistoryView;
 
 /**
- * Fragment controller for the history view
+ * History controller
  */
-public class HistoryFragmentController
-        extends Fragment implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class HistoryFragment
+        extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private HistoryView _view;
     private SimpleCursorAdapter _historyAdapter;
     private HistoryContentObserver _contentObserver;
-    private HistoryView _view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -96,7 +96,7 @@ public class HistoryFragmentController
             super.onChange(selfChange);
             if (!isAdded()) return;
 
-            getLoaderManager().restartLoader(0, null, HistoryFragmentController.this);
+            getLoaderManager().restartLoader(0, null, HistoryFragment.this);
         }
     }
 }

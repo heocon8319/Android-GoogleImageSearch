@@ -14,8 +14,7 @@ import com.squareup.otto.Bus;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import me.mikeliu.googleimagesearch.R;
-import me.mikeliu.googleimagesearch.models.ImageResultsModel;
-import me.mikeliu.googleimagesearch.services.messages.SearchStartedEvent;
+import me.mikeliu.googleimagesearch.services.messages.SearchNewQueryEvent;
 import me.mikeliu.googleimagesearch.services.storage.DatabaseHelper;
 import me.mikeliu.googleimagesearch.utils.IoC;
 
@@ -49,10 +48,7 @@ public class HistoryView {
             Cursor cursor = (Cursor) _adapter.getItem(position);
             String query = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_QUERY));
 
-            ImageResultsModel resultsModel = IoC.resolve(ImageResultsModel.class);
-            resultsModel.setNewQuery(query);
-
-            SearchStartedEvent event = new SearchStartedEvent(resultsModel);
+            SearchNewQueryEvent event = new SearchNewQueryEvent(query);
             _bus.post(event);
         }
     }

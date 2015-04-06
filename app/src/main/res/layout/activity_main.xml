@@ -4,12 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment android:name="me.mikeliu.googleimagesearch.controllers.ImageResultsFragmentController"
+    <fragment android:name="me.mikeliu.googleimagesearch.controllers.ImageResultsFragment"
               android:id="@+id/image_results_fragment"
               android:layout_width="match_parent"
               android:layout_height="match_parent" />
 
-    <fragment android:name="me.mikeliu.googleimagesearch.controllers.HistoryFragmentController"
+    <fragment android:name="me.mikeliu.googleimagesearch.controllers.HistoryFragment"
               android:id="@+id/drawer_fragment"
               android:layout_width="match_parent"
               android:layout_height="match_parent"

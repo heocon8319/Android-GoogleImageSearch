@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 
+import java.lang.reflect.Array;
+
 import me.mikeliu.googleimagesearch.ImageSearchApp;
 
 public class Utils {
@@ -25,6 +27,19 @@ public class Utils {
                         (ipAddress >> 24 & 0xff));
             }
         }
+
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] concat(T[] first, T[] second) {
+        int firstLength = first.length;
+        int secondLength = second.length;
+
+        T[] result = (T[]) Array.newInstance(first.getClass().getComponentType(), firstLength + secondLength);
+
+        System.arraycopy(first, 0, result, 0, first.length);
+        System.arraycopy(second, 0, result, first.length, second.length);
 
         return result;
     }
