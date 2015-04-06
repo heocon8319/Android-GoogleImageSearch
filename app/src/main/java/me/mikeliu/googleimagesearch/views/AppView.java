@@ -73,6 +73,8 @@ public class AppView {
         });
 
         _drawer.setDrawerListener(_drawerToggle);
+
+        updateTitle();
     }
 
     public void dispose() {

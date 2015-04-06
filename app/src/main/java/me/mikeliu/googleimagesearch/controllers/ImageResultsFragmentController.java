@@ -38,6 +38,9 @@ public class ImageResultsFragmentController extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // create data adapter
         _adapter = new ImageResultsGridAdapter(getActivity(), new ArrayList<GoogleImageSearchResult>());
+        if (_resultsModel.response != null) {
+            _adapter.addAll(_resultsModel.response.Data.Results);
+        }
 
         // create view
         _view = new ImageResultsView(_adapter);
@@ -78,8 +81,19 @@ public class ImageResultsFragmentController extends Fragment {
                 // Check search result query is the same as current query
                 if (!_resultsModel.query.equalsIgnoreCase(event.query)) return;
 
-                // TODO: merge pagination calls
-                _resultsModel.response = event.response;
+                // Merge results if needed
+                if (_resultsModel.response == null) {
+                    _resultsModel.response = event.response;
+                } else {
+                    GoogleImageSearchResult[] oldResults = _resultsModel.response.Data.Results;
+                    GoogleImageSearchResult[] newResults = event.response.Data.Results;
+                    GoogleImageSearchResult[] combinedResults = new GoogleImageSearchResult[
+                            oldResults.length + newResults.length];
+                    System.arraycopy(oldResults, 0, combinedResults, 0, oldResults.length);
+                    System.arraycopy(newResults, 0, combinedResults, oldResults.length, newResults.length);
+                    _resultsModel.response.Data.Results = combinedResults;
+                    _resultsModel.response.Data.Cursor = event.response.Data.Cursor;
+                }
 
                 _resultsModel.hasMorePages = event.status == SearchCompletedEvent.DONE;
 
